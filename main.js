@@ -1,71 +1,78 @@
-import { Input } from './input.js';
+// Import statements for shapes and utility classes
 import { Circle } from './circle.js';
 import { Rectangle } from './rectangle.js';
-import { Renderer } from './renderer.js';
-import { Shape } from './shape.js'; // If needed for reference
-import { Style } from './style.js';
+import { Triangle } from './triangle.js'; // Assume this exists
 import { Vec } from './vector.js';
+import { Style } from './style.js';
+import { Input } from './input.js';
+import { Renderer } from './renderer.js';
 
-let currentShapeType = 'circle'; // Dynamically change this to add more shapes
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('shapeToggle').addEventListener('click', toggleShape);
-});
-
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const input = new Input(canvas, window);
-input.addListeners();
-const renderer = new Renderer(canvas, ctx);
-
-let objects = [];
-let shapeBeingMade = null;
-
-function toggleShape() {
-    // Extend this toggle logic for more shapes
-    currentShapeType = currentShapeType === 'circle' ? 'rectangle' : 'circle';
-}
-
-function createShape(startPos) {
-    // Example style - you might make this dynamic or user-configurable
-    const defaultStyle = new Style('cyan', 'grey', 3);
-
-    switch (currentShapeType) {
-        case 'circle':
-            return new Circle(startPos, 0, defaultStyle); // Assuming Circle takes startPos, radius, and style
-        case 'rectangle':
-            return new Rectangle(startPos, 0, 0, defaultStyle); // Assuming Rectangle takes startPos, width, height, and style
-        // Add cases for new shapes here, initializing them with defaultStyle or a specific style
+// Shape factory object
+const shapeFactory = {
+    circle: (startPos) => new Circle(new Vec(100, 100), 50, new Style('cyan', 'grey', 3)),
+    rectangle: (startPos) => new Rectangle(startPos, 100, 50, new Style('cyan', 'grey', 3)),
+    triangle: (startPos) => {
+        const vertex2 = new Vec(startPos.x + 50, startPos.y);
+        const vertex3 = new Vec(startPos.x, startPos.y + 50);
+        return new Triangle(startPos, vertex2, vertex3, new Style('cyan', 'grey', 3));
     }
-}
+};
 
-function updateAndDraw() {
-    if (input.inputs.lclick && !shapeBeingMade) {
+class DrawingApp {
+    constructor() {
+        this.canvas = document.getElementById("canvas");
+        this.ctx = this.canvas.getContext("2d");
+        this.input = new Input(this.canvas, window);
+        this.renderer = new Renderer(this.canvas, this.ctx);
+        this.currentShapeType = 'circle';
+        this.objects = [];
+        this.shapeBeingMade = null;
 
-        const startPos = input.inputs.mouse.position.clone();
-        shapeBeingMade = createShape(startPos);
+        this.setupEventListeners();
+        this.input.addListeners();
+        requestAnimationFrame(() => this.updateAndDraw());
+    }
 
-    } else if (input.inputs.lclick && shapeBeingMade) {
+    setupEventListeners() {
+        document.getElementById('shapeToggle').addEventListener('click', () => this.toggleShape());
+        window.addEventListener('resize', () => this.input.resizeCanvas());
+    }
 
-        // Ensure input.inputs.mouse.position is defined and correctly structured
-        if (input.inputs.mouse.position) {
-            shapeBeingMade.resize(input.inputs.mouse.position);
-        } else {
-            console.error('Mouse position is undefined');
+    toggleShape() {
+        const shapeTypes = Object.keys(shapeFactory);
+        let currentShapeIndex = shapeTypes.indexOf(this.currentShapeType);
+        currentShapeIndex = (currentShapeIndex + 1) % shapeTypes.length;
+        this.currentShapeType = shapeTypes[currentShapeIndex];
+    }
+
+    createShape(startPos) {
+        return shapeFactory[this.currentShapeType](startPos);
+    }
+
+    handleInput() {
+        if (this.input.inputs.lclick && !this.shapeBeingMade) {
+            const startPos = this.input.inputs.mouse.position.clone();
+            this.shapeBeingMade = this.createShape(startPos);
+        } else if (this.input.inputs.lclick && this.shapeBeingMade) {
+            this.shapeBeingMade.resize(this.input.inputs.mouse.position);
+        } else if (!this.input.inputs.lclick && this.shapeBeingMade) {
+            this.objects.push(this.shapeBeingMade);
+            this.shapeBeingMade = null;
         }
-
-    } else if (!input.inputs.lclick && shapeBeingMade) {
-
-        objects.push(shapeBeingMade);
-        shapeBeingMade = null;
     }
 
-    renderer.clearFrame();
-    objects.forEach(obj => obj.draw(ctx)); // Each shape uses its own style for drawing
-    if (shapeBeingMade) shapeBeingMade.draw(ctx);
+    draw() {
+        this.renderer.clearFrame();
+        this.objects.forEach(obj => obj.draw(this.ctx));
+        if (this.shapeBeingMade) this.shapeBeingMade.draw(this.ctx);
+    }
 
-    requestAnimationFrame(updateAndDraw);
+    updateAndDraw() {
+        this.handleInput();
+        this.draw();
+        requestAnimationFrame(() => this.updateAndDraw());
+    }
 }
 
-input.resizeCanvas();
-requestAnimationFrame(updateAndDraw);
+// Initialize the application once the DOM is fully loaded
+document.addEventListener('DOMContentLoaded', () => new DrawingApp());

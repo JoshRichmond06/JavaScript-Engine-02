@@ -1,40 +1,53 @@
 import { Shape } from './shape.js';
-import { Style } from './style.js';
 
+/**
+ * Represents a rectangle shape.
+ * @extends Shape
+ */
 export class Rectangle extends Shape {
-    constructor(startPos, width = 0, height = 0, style = new Style()) {
+    /**
+     * Create a Rectangle.
+     * @param {Vec} startPos - The starting position of the rectangle.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {Style} style - The styling for the rectangle.
+     */
+    constructor(startPos, width, height, style) {
         super(startPos);
         this.width = width;
         this.height = height;
         this.style = style;
-        // New properties to track dynamic drawing start positions
-        this.drawStartX = startPos.x;
-        this.drawStartY = startPos.y;
     }
 
+    /**
+     * Draw the rectangle on a canvas context.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     draw(ctx) {
         ctx.beginPath();
-        // Use dynamic start positions for drawing to handle all directions
         ctx.rect(this.drawStartX, this.drawStartY, this.width, this.height);
-        ctx.fillStyle = this.style?.fillColor ?? 'black';  // Default to black if fillColor is undefined
+        ctx.fillStyle = this.style.fillColor;
         ctx.fill();
-        ctx.strokeStyle = this.style?.borderColor ?? 'black';// Default to black if borderColor is undefined
-        ctx.lineWidth = this.style?.lineWidth ?? 1; // Default to a lineWidth of 1 if undefined
+        ctx.strokeStyle = this.style.borderColor;
+        ctx.lineWidth = this.style.lineWidth;
         ctx.stroke();
     }
+
+    /**
+     * Resize the rectangle based on a new position.
+     * @param {Vec} mousePos - The new position to calculate the width and height from.
+     */
     resize(mousePos) {
-        // Calculate new dimensions based on mouse position
-        const tempWidth = mousePos.x - this.startPos.x;
-        const tempHeight = mousePos.y - this.startPos.y;
+        // Directly update dimensions based on mouse position
+        this.width = Math.abs(mousePos.x - this.startPos.x);
+        this.height = Math.abs(mousePos.y - this.startPos.y);
 
-        // Update drawing start positions based on the direction of resizing
-        this.drawStartX = tempWidth < 0 ? mousePos.x : this.startPos.x;
-        this.drawStartY = tempHeight < 0 ? mousePos.y : this.startPos.y;
-
-        // Always store width and height as positive values
-        this.width = Math.abs(tempWidth);
-        this.height = Math.abs(tempHeight);
+        // Adjust startPos for negative dimensions if necessary
+        if (mousePos.x < this.startPos.x) {
+            this.startPos.x = mousePos.x;
+        }
+        if (mousePos.y < this.startPos.y) {
+            this.startPos.y = mousePos.y;
+        }
     }
-
-
 }

@@ -1,23 +1,42 @@
 import { Shape } from './shape.js';
+import { Vec } from './vector.js';
 import { Style } from './style.js';
 
+/**
+ * Represents a circle shape.
+ * @extends Shape
+ */
 export class Circle extends Shape {
-    constructor(startPos, radius, style) { // Ensure style is included here
+    /**
+     * Create a Circle.
+     * @param {Vec} startPos - The starting position of the circle.
+     * @param {number} radius - The radius of the circle.
+     * @param {Style} style - The styling for the circle.
+     */
+    constructor(startPos, radius, style) {
         super(startPos);
         this.radius = radius;
-        this.style = style; // Make sure style is assigned to this.style
+        this.style = style;
     }
 
+    /**
+     * Draw the circle on a canvas context.
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
+     */
     draw(ctx) {
         ctx.beginPath();
-        ctx.arc(this.startPos.x, this.startPos.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.style?.fillColor ?? 'black'; // Use nullish coalescing operator to provide default value
+        ctx.arc(this.drawStartX, this.drawStartY, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.style.fillColor;
         ctx.fill();
-        ctx.strokeStyle = this.style?.borderColor ?? 'black';
-        ctx.lineWidth = this.style?.lineWidth ?? 1;
+        ctx.strokeStyle = this.style.borderColor;
+        ctx.lineWidth = this.style.lineWidth;
         ctx.stroke();
     }
 
+    /**
+     * Resize the circle based on a new position.
+     * @param {Vec} mousePos - The new position to calculate the radius from.
+     */
     resize(mousePos) {
         this.radius = this.startPos.distance(mousePos);
     }
