@@ -9,7 +9,7 @@ import { Renderer } from './renderer.js';
 
 // Shape factory object
 const shapeFactory = {
-    circle: (startPos) => new Circle(new Vec(100, 100), 50, new Style('cyan', 'grey', 3)),
+    circle: (startPos) => new Circle(startPos, 50, new Style('cyan', 'grey', 3)),
     rectangle: (startPos) => new Rectangle(startPos, 100, 50, new Style('cyan', 'grey', 3)),
     triangle: (startPos) => {
         const vertex2 = new Vec(startPos.x + 50, startPos.y);

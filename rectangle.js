@@ -1,17 +1,8 @@
 import { Shape } from './shape.js';
 
-/**
- * Represents a rectangle shape.
- * @extends Shape
- */
+
 export class Rectangle extends Shape {
-    /**
-     * Create a Rectangle.
-     * @param {Vec} startPos - The starting position of the rectangle.
-     * @param {number} width - The width of the rectangle.
-     * @param {number} height - The height of the rectangle.
-     * @param {Style} style - The styling for the rectangle.
-     */
+
     constructor(startPos, width, height, style) {
         super(startPos);
         this.width = width;
@@ -19,17 +10,9 @@ export class Rectangle extends Shape {
         this.style = style;
     }
 
-    /**
-     * Draw the rectangle on a canvas context.
-     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context.
-     */
     draw(ctx) {
         ctx.beginPath();
-<<<<<<< Updated upstream
         ctx.rect(this.drawStartX, this.drawStartY, this.width, this.height);
-=======
-        ctx.rect(this.startPos.x, this.startPos.y, this.width, this.height);
->>>>>>> Stashed changes
         ctx.fillStyle = this.style.fillColor;
         ctx.fill();
         ctx.strokeStyle = this.style.borderColor;
@@ -37,10 +20,6 @@ export class Rectangle extends Shape {
         ctx.stroke();
     }
 
-    /**
-     * Resize the rectangle based on a new position.
-     * @param {Vec} mousePos - The new position to calculate the width and height from.
-     */
     resize(mousePos) {
         // Directly update dimensions based on mouse position
         this.width = Math.abs(mousePos.x - this.startPos.x);
