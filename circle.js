@@ -25,7 +25,11 @@ export class Circle extends Shape {
      */
     draw(ctx) {
         ctx.beginPath();
+<<<<<<< Updated upstream
         ctx.arc(this.drawStartX, this.drawStartY, this.radius, 0, Math.PI * 2);
+=======
+        ctx.arc(this.startPos.x, this.startPos.y, this.radius, 0, Math.PI * 2);
+>>>>>>> Stashed changes
         ctx.fillStyle = this.style.fillColor;
         ctx.fill();
         ctx.strokeStyle = this.style.borderColor;

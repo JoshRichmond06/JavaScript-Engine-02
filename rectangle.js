@@ -25,7 +25,11 @@ export class Rectangle extends Shape {
      */
     draw(ctx) {
         ctx.beginPath();
+<<<<<<< Updated upstream
         ctx.rect(this.drawStartX, this.drawStartY, this.width, this.height);
+=======
+        ctx.rect(this.startPos.x, this.startPos.y, this.width, this.height);
+>>>>>>> Stashed changes
         ctx.fillStyle = this.style.fillColor;
         ctx.fill();
         ctx.strokeStyle = this.style.borderColor;

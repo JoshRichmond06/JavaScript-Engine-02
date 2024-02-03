@@ -1,13 +1,9 @@
 export class Shape {
-    constructor(startPos) {
-        this.startPos = startPos;
-    }
-
     draw(ctx) {
-        // Implementation or placeholder
+        throw new Error("Draw method must be implemented by subclass");
     }
 
     resize(mousePos) {
-        // Implementation or placeholder
+        throw new Error("Resize method must be implemented by subclass");
     }
 }
