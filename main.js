@@ -24,19 +24,27 @@ let movingShape = false;
 
 function toggleShape() {
     currentShapeType = currentShapeType === 'circle' ? 'rectangle' : 'circle';
+    document.getElementById('shapeToggle').textContent = currentShapeType.charAt(0).toUpperCase() + currentShapeType.slice(1);
+}
+
+class ShapeFactory {
+    static createShape(type, position, style) {
+        switch (type) {
+            case 'circle':
+                return new Circle(position, 0, style);
+            case 'rectangle':
+                return new Rectangle(position, 0, 0, style);
+            // Add new cases here for additional shapes
+            default:
+                throw new Error(`Unknown shape type: ${type}`);
+        }
+    }
 }
 
 function createShape(mousePosition) {
     const position = new Vec(mousePosition.x, mousePosition.y);
     const defaultStyle = new Style('cyan', 'grey', 3);
-
-    switch (currentShapeType) {
-        case 'circle':
-            return new Circle(position, 0, defaultStyle);
-        case 'rectangle':
-            return new Rectangle(position, 0, 0, defaultStyle);
-        // Additional shapes can be added here
-    }
+    return ShapeFactory.createShape(currentShapeType, position, defaultStyle);
 }
 
 function updateAndDraw() {
@@ -82,6 +90,11 @@ function updateAndDraw() {
             }
         });
 
+        if (currentMovingShape && input.inputs.rclick) {
+            currentMovingShape.moveTo(input.inputs.mouse.position);
+            currentMovingShape.velocity = input.inputs.mouse.velocity;
+        }
+
         if (closestObji !== null) {
             movingShape = true;
             objects[closestObji].isMoved = true;
@@ -91,13 +104,21 @@ function updateAndDraw() {
     if (!input.inputs.rclick && movingShape) {
         movingShape = false;
         objects.forEach(obj => obj.isMoved = false);
+        movingShape = null;
     }
 
+    shapes.forEach(shape => {
+        if (shape.velocity) {
+            shape.position.add(shape.velocity.clone().multiply(dt)); // dt is the delta time since last frame
+        }
+    });
+    
     if (movingShape) {
         objects.forEach(obj => {
             if (obj.isMoved) {
                 obj.position = new Vec(input.inputs.mouse.position.x, input.inputs.mouse.position.y);
             }
+            
         });
     }
 
