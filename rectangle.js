@@ -1,46 +1,47 @@
-import { Shape } from './shape.js';
-import { Style } from './style.js';
+import { Shape } from './Shape.js';
+import { Style } from './Style.js';
+import { Vec } from './vector.js'; // Make sure to import the Vec class
+import { circleRectCollision } from './collisionUtils.js'; // Import the circleRectCollision function
 import { RigidBody } from './rigidBody.js';
+import { Circle } from './circle.js';
+
 
 export class Rectangle extends Shape {
-    constructor(position, width = 0, height = 0, style = new Style()) {
+    constructor(position, width, height, style = new Style()) {
         super(position, style);
         this.width = width;
         this.height = height;
-        // Initialize RigidBody with position. Ensure RigidBody's constructor supports this.
-        this.rigidBody = new RigidBody(this.position);
+        this.rigidBody = new RigidBody(this); // Use RigidBody instance directly
     }
 
     draw(ctx) {
-        ctx.beginPath(); // Begin a new path for the rectangle
-        ctx.rect(this.position.x, this.position.y, this.width, this.height); // Define the rectangle path
-        // Set the fill color, defaulting to black if undefined
-        ctx.fillStyle = this.style?.fillColor ?? 'black';
-        ctx.fill(); // Fill the rectangle with the fill color
-        // Set the stroke color, defaulting to black if undefined
-        ctx.strokeStyle = this.style?.borderColor ?? 'black';
-        // Set the line width, defaulting to 1 if undefined
-        ctx.lineWidth = this.style?.lineWidth ?? 1;
-        ctx.stroke(); // Stroke the rectangle border
+        ctx.beginPath();
+        ctx.rect(this.position.x, this.position.y, this.width, this.height);
+        ctx.fillStyle = this.style.fillColor;
+        ctx.fill();
+        ctx.strokeStyle = this.style.borderColor;
+        ctx.lineWidth = this.style.lineWidth;
+        ctx.stroke();
     }
 
     resize(mousePos) {
-        // Calculate new width and height based on the difference between the current position and mouse position
         const tempWidth = mousePos.x - this.position.x;
         const tempHeight = mousePos.y - this.position.y;
-
-        // Update the rectangle's width and height to the absolute values to ensure they're positive
         this.width = Math.abs(tempWidth);
         this.height = Math.abs(tempHeight);
-
-        this.rigidBody.position = this.position.clone();
     }
 
-    update(dt) {
-        // Assuming dt is the delta time since the last update
-        // Update position based on velocity
-        if (this.rigidBody.velocity) {
-            this.position.add(this.rigidBody.velocity.multiply(dt));
+    collidesWith(otherShape) {
+        if (otherShape instanceof Circle) {
+            // Use the circleRectCollision function for Circle-Rectangle collision
+            return circleRectCollision(otherShape, this);
+        } else if (otherShape instanceof Rectangle) {
+            // Rectangle-Rectangle collision logic
+            return !(this.position.x + this.width < otherShape.position.x ||
+                     this.position.x > otherShape.position.x + otherShape.width ||
+                     this.position.y + this.height < otherShape.position.y ||
+                     this.position.y > otherShape.position.y + otherShape.height);
         }
+        return false;
     }
 }

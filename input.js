@@ -1,17 +1,14 @@
-import { Vec } from './vector.js';
-
+import {Vec} from './vector.js';
 
 export class Input {
-    // Constructor to initialize the Input class with a canvas and window reference
-    constructor(canv, win) {
-        this.canv = canv; // The canvas element where drawing occurs
-        this.window = win; // The window object for handling resize events
-
-        this.prevMousePosition = new Vec(0, 0);
-        this.lastUpdateTime = Date.now();
-
-        // Initializes input states including mouse position and click states
-        this.inputs = { mouse: { position: new Vec(0, 0) }, lclick: false, rclick: false };
+    constructor(canv, win, dt) {
+        this.canv = canv;
+        this.window = win;
+        this.dt = dt;
+        this.inputs = {
+            mouse: {position: new Vec(0, 0), velocity: new Vec(0, 0), movedObject: null}, 
+            lclick: false, rclick: false, space: false, touches: 0
+        };
 
         // Sets up event listeners for user interactions
         this.addListeners();
@@ -41,33 +38,38 @@ export class Input {
         if (button) this.inputs[button] = isDown; // Sets the state based on the mouse event
     }
 
-    // Updates the mouse position state based on the latest mousemove event
-    mouseMove = (e) => {
-        // Calculates mouse position relative to the canvas
-        const currentTime = Date.now();
-        const dt = (currentTime - this.lastUpdateTime) / 1000; // Convert to seconds
-        const rect = this.canv.getBoundingClientRect();
-        const newX = e.clientX - rect.left;
-        const newY = e.clientY - rect.top;
-        const dx = newX - this.prevMousePosition.x;
-        const dy = newY - this.prevMousePosition.y;
-    
-        // Calculate velocity
-        this.inputs.mouse.velocity = new Vec(dx / dt, dy / dt);
-    
-        // Update positions for the next calculation
-        this.inputs.mouse.position.x = newX;
-        this.inputs.mouse.position.y = newY;
-        this.prevMousePosition = new Vec(newX, newY);
-        this.lastUpdateTime = currentTime;
-    };
+    // makes context menu not pop up when rclick
+    onContextMenu(e) {
+        e.preventDefault();
+    }
+
+     // Updates the mouse position state based on the latest mousemove event
+    mouseMove(e) {
+        this.window.clearTimeout(this.inputs.mouseTimer);
+
+        const x = e.pageX - this.canv.offsetLeft;
+        const y = e.pageY - this.canv.offsetTop;
+
+        const dx = x - this.inputs.mouse.position.x;
+        const dy = y - this.inputs.mouse.position.y;
+        this.inputs.mouse.velocity.x = dx / this.dt;
+        this.inputs.mouse.velocity.y = dy / this.dt;
+
+        this.inputs.mouse.position.x = x;
+        this.inputs.mouse.position.y = y;
+        
+        this.inputs.mouseTimer = this.window.setTimeout(function () {
+            this.inputs.mouse.velocity.x = 0; 
+            this.inputs.mouse.velocity.y = 0;
+        }.bind(this), 100);
+    }
 
     // Adjusts canvas size to match the window size, improving responsiveness
     resizeCanvas = () => {
         this.canv.width = this.window.innerWidth;
         this.canv.height = this.window.innerHeight;
     }
-
+    
     // Utility function to debounce another function by a given delay
     // This is useful for limiting how often a particularly expensive operation is run
     debounce = (func, delay) => {
