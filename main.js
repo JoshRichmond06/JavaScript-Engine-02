@@ -126,5 +126,18 @@ function addObject(shape) {
     objects.push(object);
 } 
 
-const vector1 = new Vec(10, 50);
-renderer.renderedAlways.push(vector1);
+//making vectors
+const origin = new Vec(100, 100);
+
+const vector1 = new Vec(50, 60);
+vector1.renderOrigin = origin;
+vector1.color = "red";
+
+const vector2 = new Vec(-50, 60);
+vector2.renderOrigin = origin;
+vector2.color = "blue";
+
+const testVector = vector1.clone().add(vector2);
+testVector.renderOrigin = origin;
+
+renderer.renderedAlways.push(vector1, vector2, testVector);

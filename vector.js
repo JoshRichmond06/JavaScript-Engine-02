@@ -2,6 +2,7 @@ export class Vec {
 	constructor(x, y) {
 		this.x = x;
 		this.y = y;
+		this.renderOrigin;
 	}
     //chainable methods
 	copy (v) {	//copy the xy of another vector into this
@@ -101,16 +102,22 @@ export class Vec {
 	}
 
 	draw(ctx, strokeColor) {	// TO DO rename all draws to Vector draw, circle draw, rectangle draw, etc for readability 
-		ctx.strokeStyle = strokeColor;
+		if (this.color) {
+			ctx.strokeStyle = this.color;
+		} else {
+			ctx.strokeStyle = strokeColor;
+		}
+
         ctx.lineWidth = 3;
+		const renderEnd = this.renderOrigin.clone().add(this);
 		//line from vector tail to vector head (head is arrow part)
 		ctx.beginPath();	//start draw
-		ctx.moveTo(0, 0);	//where to start draw (vectors start at origin)
-		ctx.lineTo(this.x, this.y);	//to create a strait line
+		ctx.moveTo(this.renderOrigin.x, this.renderOrigin.y);	//where to start draw (vectors start at origin)
+		ctx.lineTo(renderEnd.x, renderEnd.y);	//to create a strait line
 		ctx.stroke();
 		//circle at vector head
 		ctx.beginPath();
-        ctx.arc(this.x, this.y, 5, 0, Math.PI*2, true);	//radius 5
+        ctx.arc(renderEnd.x, renderEnd.y, 5, 0, Math.PI*2, true);	//radius 5
         ctx.closePath();
     
         ctx.stroke();

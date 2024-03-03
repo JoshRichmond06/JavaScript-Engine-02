@@ -19,6 +19,7 @@ export class Collisions {
             }
         }
     }
+    
     narrowPhazeDetection(objects) {
         for (let i = 0; i < objects.length; i++) {
             for (let j = i + 1; j < objects.length; j++) {  // try j = i+1
@@ -30,6 +31,17 @@ export class Collisions {
                     }
                 }
             }
+        }
+    }
+
+    detectAabbCollision(o1, o2) {
+        let o1aabb = o1.shape.aabb;
+        let o2aabb = o2.shape.aabb;
+        if (o1aabb.max.x > o2aabb.min.x &&
+            o1aabb.max.y > o2aabb.min.y &&
+            o2aabb.max.x > o1aabb.min.x &&
+            o2aabb.max.y > o1aabb.min.y) {
+            this.possibleCollisions.push([o1, o2]);
         }
     }
 
