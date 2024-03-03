@@ -126,5 +126,5 @@ function addObject(shape) {
     objects.push(object);
 } 
 
-const vector1 = new Vec(200, 100);
+const vector1 = new Vec(10, 50);
 renderer.renderedAlways.push(vector1);

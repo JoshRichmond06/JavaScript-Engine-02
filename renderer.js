@@ -9,26 +9,20 @@ export class Renderer {
         this.renderedNextFrame = [];    //objects that are rendered for only one frame
     }
 
-    drawFrame(objects, fillCol, strokeColor) {
+    drawFrame(objects, fillCol, bordCol) {
         for (let i = 0; i < objects.length; i++) {
             const shape = objects[i].shape;
-            shape.draw(this.ctx, fillCol, strokeColor);
+            shape.draw(this.ctx, fillCol, bordCol);
             shape.aabb.draw(this.ctx, "red");
-            //draw vertices
-            if (shape instanceof Rect) {
-                shape.vertices.forEach(vertex => {
-                    vertex.drawPoint(this.ctx, "black");
-                });
-            }
 
         }
         for (let i = 0; i < this.renderedNextFrame.length; i++) {
-            this.renderedNextFrame[i].draw(this.ctx, strokeColor);  //draw all objects in array
+            this.renderedNextFrame[i].draw(this.ctx, bordCol);  //draw all objects in array
         }
         this.renderedNextFrame = [];    //empty array, means that we only draw them once, then clear
 
         for (let i = 0; i < this.renderedAlways.length; i++) {
-            this.renderedAlways[i].draw();  //draw all objects in array, does not clear array like next frame does
+            this.renderedAlways[i].draw(this.ctx, bordCol);  //draw all objects in array, does not clear array like next frame does
         }
     }
     clearFrame() {

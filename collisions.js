@@ -1,15 +1,24 @@
 import { Circle } from "./circle.js";
-import {Rect} from './rectangle.js';
+import {Rect} from './rect.js';
 
 export class Collisions {
     constructor() {
+        this.possibleCollisions = [];
         this.collisions = [];
     }
 
     clearCollisions() {
+        this.possibleCollisions = [];
         this.collisions = []; //reset it (assigns it to empty array)
     }
 
+    broadPhazeDetection (objects) {
+        for (let i = 0; i < objects.length; i++) {
+            for (let j = i +1; j < objects.length; j++) {
+                this.detectAabbCollision(objects[i], objects[j]);
+            }
+        }
+    }
     narrowPhazeDetection(objects) {
         for (let i = 0; i < objects.length; i++) {
             for (let j = i + 1; j < objects.length; j++) {  // try j = i+1
