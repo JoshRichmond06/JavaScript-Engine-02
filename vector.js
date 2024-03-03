@@ -100,12 +100,19 @@ export class Vec {
 		return this.clone().subtract(v).magnitude();
 	}
 
-	drawPoint(ctx, strokeColor) {
+	draw(ctx, strokeColor) {	// TO DO rename all draws to Vector draw, circle draw, rectangle draw, etc for readability 
+		ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = 3;
+		//line from vector tail to vector head (head is arrow part)
+		ctx.beginPath();	//start draw
+		ctx.moveTo(0, 0);	//where to start draw (vectors start at origin)
+		ctx.lineTo(this.x, this.y);	//to create a strait line
+		ctx.stroke();
+		//circle at vector head
 		ctx.beginPath();
         ctx.arc(this.x, this.y, 5, 0, Math.PI*2, true);	//radius 5
         ctx.closePath();
-        ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = 3;
+    
         ctx.stroke();
 	}
 }

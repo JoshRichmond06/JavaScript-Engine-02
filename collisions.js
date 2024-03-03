@@ -1,78 +1,87 @@
-import {Circle} from './circle.js';
+import { Circle } from "./circle.js";
+import {Rect} from './rectangle.js';
 
 export class Collisions {
     constructor() {
-        this.possibleCollisions = [];
         this.collisions = [];
     }
 
     clearCollisions() {
-        this.possibleCollisions = [];
-        this.collisions = [];
-    }
-
-    broadPhazeDetection (objects) {
-        for(let i=0; i<objects.length; i++) {
-            for(let j=i+1; j<objects.length; j++) {
-                this.detectAabbCollision(objects[i], objects[j]);
-            }
-        }
+        this.collisions = []; //reset it (assigns it to empty array)
     }
 
     narrowPhazeDetection(objects) {
-        for (let i=0; i<objects.length; i++) {
-            for (let j=0; j<objects.length; j++) {  //try j=i+1
-                if(j > i) {
-                    //detect collisions
-                    if(objects[i].shape instanceof Circle && 
-                        objects[j].shape instanceof Circle) {
+        for (let i = 0; i < objects.length; i++) {
+            for (let j = i + 1; j < objects.length; j++) {  // try j = i+1
+                if (j > i) {
+                    if (objects[i].shape instanceof Circle && objects[j].shape instanceof Circle) {
                         this.detectCollisionCircleCircle(objects[i], objects[j]);
-                    }   //later detect rectangle rectangle here
+                    } else if (objects[i].shape instanceof Rect && objects[j].shape instanceof Rect) {
+                        this.detectCollisionRectangleRectangle(objects[i], objects[j]);
+                    }
                 }
             }
         }
     }
 
-    detectAabbCollision(o1, o2) {
-        let o1aabb = o1.shape.aabb;
-        let o2aabb = o2.shape.aabb;
-        if (o1aabb.max.x > o2aabb.min.x &&
-            o1aabb.max.y > o2aabb.min.y &&
-            o2aabb.max.x > o1aabb.min.x &&
-            o2aabb.max.y > o1aabb.min.y) {
-            this.possibleCollisions.push([o1, o2]);
-        }
-    }
+    detectCollisionCircleCircle(obj1, obj2) {   //  obj1 and abj2 are rigid bodies from array objects in main
+        const circle1 = obj1.shape;  //  rigid bodies have shape, circle or rectangle
+        const circle2 = obj2.shape;  //  shape has position and radius
+        const distance = circle1.position.distanceTo(circle2.position);   //  returns magnitude of ditance between these two shapes as a vector (position is from circle class)
 
-    detectCollisionCircleCircle(o1, o2) {   //o1 and o2 are rigidBodies from array objects in main
-        const s1 = o1.shape;    //rigidBodies have shape circle or rectangle
-        const s2 = o2.shape;    //shape has position and radius
-        const dist = s1.position.distanceTo(s2.position);
-        if (dist < s1.radius + s2.radius) {
-            const overlap = s1.radius + s2.radius - dist;
-            //unit vector from s1 to s2
-            const normal = s2.position.clone().subtract(s1.position).normalize();   //unit vector(direction) normal(perpendicular) to contact surface
-            this.collisions.push({  //object
-                collidedPair: [o1, o2], //[array]
+        if (distance < circle1.radius + circle2.radius) {   //  finding if the objects touch/overlap, if they do, the collision acts on it
+            const overlap = circle1.radius + circle2.radius - distance; //  vector from circle1 to circle2
+            const normal = circle2.position.clone().subtract(circle1.position).normalize(); //  dont want to change original vector, so we subtract from a clone() is a unit vector means directon
+            this.collisions.push({  //  make a object without a constructor
+                collidedPair: [obj1, obj2], //  make array of objects that are colliding
                 overlap: overlap,
                 normal: normal
             })
         }
     }
 
-    //detect rectangles collisions
+    //  detect rectangles collisions
 
-    pushOffObjects(o1, o2, overlap, normal) {
-        o1.shape.position.subtract(normal.clone().multiply(overlap/2));
-        o2.shape.position.add(normal.clone().multiply(overlap/2));
+    detectCollisionRectangleRectangle(obj1, obj2) {
+        const rect1 = obj1.shape;
+        const rect2 = obj2.shape;
+    
+        // Calculate the left, right, top, and bottom of each rectangle
+        const left1 = rect1.position.x - rect1.width / 2;
+        const right1 = rect1.position.x + rect1.width / 2;
+        const top1 = rect1.position.y - rect1.height / 2;
+        const bottom1 = rect1.position.y + rect1.height / 2;
+    
+        const left2 = rect2.position.x - rect2.width / 2;
+        const right2 = rect2.position.x + rect2.width / 2;
+        const top2 = rect2.position.y - rect2.height / 2;
+        const bottom2 = rect2.position.y + rect2.height / 2;
+    
+        // Check for overlap
+        const isColliding = right1 >= left2 &&
+                            left1 <= right2 &&
+                            bottom1 >= top2 &&
+                            top1 <= bottom2;
+    
+        if (isColliding) {
+            console.log('true');
+        } else {
+            console.log('false');
+        }
+    }
+
+    pushOffObjects(obj1, obj2, overlap, normal) {
+        obj1.shape.position.subtract(normal.clone().multiply(overlap / 2));
+        obj2.shape.position.add(normal.clone().multiply(overlap / 2));
+
     }
 
     resolveCollisions() {
-        let collidedPair, overlap, normal, o1, o2;
-        for(let i=0; i<this.collisions.length; i++) {
-            ({collidedPair, overlap, normal} = this.collisions[i]);
-            [o1, o2] = collidedPair;
-            this.pushOffObjects(o1, o2, overlap, normal);
+        let collidedPair, overlap, normal, obj1, obj2;
+        for (let i = 0; i < this.collisions.length; i++) {
+            ({ collidedPair, overlap, normal } = this.collisions[i]);
+            [obj1, obj2] = collidedPair;
+            this.pushOffObjects(obj1, obj2, overlap, normal);
         }
     }
 }

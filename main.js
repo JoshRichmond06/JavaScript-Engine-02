@@ -4,6 +4,7 @@ import {Rect} from './rect.js';
 import {Input} from './input.js';
 import {RigidBody} from './rigidBody.js';
 import {Collisions} from './collisions.js';
+import {Vec} from './vector.js';
 
 const SMALLEST_RADIUS = 10;
 const dt = 1/60;    //time per frame
@@ -124,3 +125,6 @@ function addObject(shape) {
     const object = new RigidBody(shape);  
     objects.push(object);
 } 
+
+const vector1 = new Vec(200, 100);
+renderer.renderedAlways.push(vector1);
