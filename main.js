@@ -1,6 +1,6 @@
 import {Renderer} from './renderer.js';
 import {Circle} from './circle.js';
-import {Rect} from './rectangle.js';
+import {Rect} from './rect.js';
 import {Input} from './input.js';
 import {RigidBody} from './rigidBody.js';
 import {Collisions} from './collisions.js';
@@ -85,6 +85,8 @@ function updateAndDraw() {
 
     //COLLISIONS
     col.clearCollisions();
+    col.broadPhazeDetection(objects);
+    console.log(col.possibleCollisions.length);
     col.narrowPhazeDetection(objects);  //detect all possible collisions
     col.resolveCollisions();    //push off
 

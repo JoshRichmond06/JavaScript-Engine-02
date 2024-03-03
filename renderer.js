@@ -1,5 +1,5 @@
 import {Circle} from './circle.js';
-import {Rect} from './rectangle.js';
+import {Rect} from './rect.js';
 
 export class Renderer {
     constructor(canv, ctx) {
@@ -9,7 +9,15 @@ export class Renderer {
     
     drawFrame(objects, fillCol, bordCol) {
         for (let i = 0; i<objects.length; i++) {
-            objects[i].shape.draw(this.ctx, fillCol, bordCol);
+            const shape = objects[i].shape;
+            shape.draw(this.ctx, fillCol, bordCol);
+            shape.aabb.draw(this.ctx, "red");
+            //draw vertices
+            if (shape instanceof Rect) {
+                shape.vertices.forEach(vertex => {
+                    vertex.drawPoint(this.ctx, "black");
+                });
+            }
         } 
     }
 
