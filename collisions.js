@@ -67,6 +67,64 @@ export class Collisions {
     }
 
     //  detect rectangles collisions
+    detectCollisionCirclePolygon(circle, polygon) {
+        const vertices = polygon.shape.vertices;
+        const circleShape = circle.shape;
+        let overlap, normal, axis;
+
+        overlap = number.MAX_VALUE;
+
+        for (let i = 0; i < vertices.length; i++) {
+            const vertices1 = vertices[i];
+            const vertices2 = vertices[(i + 1) % vertices.length];
+            axis = vertices2.clone().subtract(vertices1).rotateCCW90().normalize();
+            const [min1, max1] = this.projectVertices(vertices, axis);
+            const [min2, max2] = this.projectCircle(center, radius, axis);
+
+            if (min2 >= max1 || min1 >= max2) {
+                //we dont have collisions
+                return;
+            }
+
+            const axisOverlap = Math.min(max2 - min1, max1 - min2);
+            if (overlap >= axisOverlap) {   //find smallest overlap
+                overlap = axisOverlap;
+            }
+        }
+    }
+
+    projectVertices(vertices, axis) {
+        let min, max;
+        min = vertices[0].dot(axis);    //first vertex projection
+        max = min;  //save it as both min and max
+
+        for (let i = 1; i < vertices.length; i++) { //already calculated 0 before so do i = 1
+            const proj = vertices[i].dot(axis);
+            if (proj < min) {
+                min = proj;
+            }
+            if (proj > max) {
+                max = proj;
+            }
+        }
+
+        return [min, max];  //smallest and largest projection
+    }
+
+    projectCircle(center, radius, axis) {
+        let min, max;
+        //points on circle distance 1 radius from center
+        const points = [center.clone().moveDistInDir(radius, axis), center.clone().moveDistInDir(-radius, axis)];
+
+        min = points[0].dot(axis);  //project points
+        max = points[1].dot(axis);
+        if (min > max) {    //swap min and max if we chose wrong
+            const t = min;
+            min = max;
+            max = t;
+        }
+        return [min, max];
+    }
 
     detectCollisionRectangleRectangle(obj1, obj2) {
         const rect1 = obj1.shape;
