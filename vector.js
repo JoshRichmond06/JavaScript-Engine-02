@@ -4,62 +4,62 @@ export class Vec {
 		this.y = y;
 		this.renderOrigin;
 	}
-	//chainable methods
-	copy(v) {	//copy the xy of another vector into this
+    //chainable methods
+	copy (v) {	//copy the xy of another vector into this
 		this.x = v.x;
 		this.y = v.y;
 		return this;
 	}
-
-	setX(x) {
+	
+	setX (x) {
 		this.x = x;
 		return this;
 	}
 
-	setY(y) {
+	setY (y) {
 		this.y = y;
 		return this;
 	}
 
-	add(v) {		//add a vector to this
+	add (v) {		//add a vector to this
 		this.x += v.x;
 		this.y += v.y;
 		return this;
 	}
 
-	addX(x) {	//scalar addition
+	addX (x) {	//scalar addition
 		this.x += x;
 		return this;
 	}
-
-	addY(y) {	//scalar addition
+	
+	addY (y) {	//scalar addition
 		this.y += y;
 		return this;
 	}
-
-	subtract(v) {
+	
+	subtract (v) {
 		this.x -= v.x;
 		this.y -= v.y;
 		return this;
 	}
 
-	subtractX(x) {
+	subtractX (x) {
 		this.x -= x;
 		return this;
 	}
 
-	subtractY(y) {
+	subtractY (y) {
 		this.y -= y;
 		return this;
 	}
-
-	multiply(s) {
+	
+	multiply (s) {
 		this.x *= s;
 		this.y *= s;
 		return this;
 	}
-
-	divide(s) {
+	
+	divide (s) {
 		this.x /= s;
 		this.y /= s;
 		return this;
@@ -73,7 +73,7 @@ export class Vec {
 
 	normalize() {
 		const length = this.magnitude();
-		if (length > 0) {
+		if(length > 0) {
 			this.x /= length;
 			this.y /= length;
 		}
@@ -93,14 +93,14 @@ export class Vec {
 		this.x = -this.y;
 		this.y = x;
 		return this;
-	}
+	}	
 
 	rotateCCW90() {
 		const x = this.x;
 		this.x = this.y;
 		this.y = -x;
 		return this;
-	}
+	}	
 
 	invert() {
 		this.x *= -1;
@@ -118,20 +118,20 @@ export class Vec {
 		return this;
 	}
 
-	moveDistInDir(dist, dir) {	//dir is a unit vector
+	moveDistInDir (dist, dir) {	//dir is a unit vector
 		return this.add(dir.clone().multiply(dist));
 	}
-
+	
 	//non-chainable
-	clone() {	//create a new vector with xy of this
+	clone () {	//create a new vector with xy of this
 		return new Vec(this.x, this.y);
 	}
 
-	magnitude() {
+    magnitude () {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
 
-	distanceTo(v) {
+	distanceTo (v) {
 		return this.clone().subtract(v).magnitude();
 	}
 
@@ -141,25 +141,29 @@ export class Vec {
 
 	draw(ctx, strokeColor) {
 		if (this.color) {
-			ctx.strokeColor = this.color;
-		} else {
-			ctx.strokeStyle = strokeColor;
+			strokeColor = this.color;
 		}
-		ctx.lineWidth = 3;
-		const renderEnd = this.renderOrigin.clone().add(this);
-		
-		ctx.beginPath();
-		ctx.moveTo(this.renderOrigin.x, this.renderOrigin.y);
-		ctx.lineTo(renderEnd.x, renderEnd.y);
-
-		ctx.stroke();
-
-		//circle at vector head
-		ctx.beginPath();
-		ctx.arc(renderEnd.x, renderEnd.y, 5, 0, Math.PI * 2, true);	//radius 5
-		ctx.closePath();
-
-		ctx.stroke();
-
+		if(this.renderOrigin) {
+			const renderEnd = this.renderOrigin.clone().add(this);
+			ctx.beginPath();
+			ctx.moveTo(this.renderOrigin.x, this.renderOrigin.y);
+			ctx.lineTo(renderEnd.x, renderEnd.y);
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = strokeColor;
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.arc(renderEnd.x, renderEnd.y, 5, 0, Math.PI*2, true);	//radius 5
+			ctx.closePath();
+			ctx.strokeStyle = strokeColor;
+			ctx.lineWidth = 3;
+			ctx.stroke();
+		} else {
+			ctx.beginPath();
+			ctx.arc(this.x, this.y, 5, 0, Math.PI*2, true);	//radius 5
+			ctx.closePath();
+			ctx.strokeStyle = strokeColor;
+			ctx.lineWidth = 3;
+			ctx.stroke();
+		}
 	}
 }

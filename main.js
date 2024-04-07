@@ -1,10 +1,10 @@
 import {Renderer} from './renderer.js';
 import {Circle} from './circle.js';
-import {Rect} from './rectangle.js';
+import {Rect} from './rect.js';
 import {Input} from './input.js';
 import {RigidBody} from './rigidBody.js';
 import {Collisions} from './collisions.js';
-import {Aabb} from './aabb.js';
+import {Vec} from './vector.js';
 
 const SMALLEST_RADIUS = 10;
 const dt = 1/60;    //time per frame
@@ -12,7 +12,7 @@ const dt = 1/60;    //time per frame
 const canv = document.getElementById("canvas");
 const ctx = canv.getContext("2d");
 
-const renderer = new Renderer(canv, ctx);
+export const renderer = new Renderer(canv, ctx);
 const fillCol = "darkGray";
 const bordCol = "black";
 
@@ -86,6 +86,7 @@ function updateAndDraw() {
 
     //COLLISIONS
     col.clearCollisions();
+    col.broadPhazeDetection(objects);
     col.narrowPhazeDetection(objects);  //detect all possible collisions
     col.resolveCollisions();    //push off
 
