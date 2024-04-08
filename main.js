@@ -1,18 +1,18 @@
 import {Renderer} from './renderer.js';
 import {Circle} from './circle.js';
-import {Rect} from './rect.js';
+import {Rect} from './rectangle.js';
 import {Input} from './input.js';
 import {RigidBody} from './rigidBody.js';
 import {Collisions} from './collisions.js';
-import {Vec} from './vector.js';
-
+import {Aabb} from './aabb.js';
+import { Vec } from './vector.js';
 const SMALLEST_RADIUS = 10;
 const dt = 1/60;    //time per frame
 
 const canv = document.getElementById("canvas");
 const ctx = canv.getContext("2d");
 
-export const renderer = new Renderer(canv, ctx);
+const renderer = new Renderer(canv, ctx);
 const fillCol = "darkGray";
 const bordCol = "black";
 
@@ -86,7 +86,6 @@ function updateAndDraw() {
 
     //COLLISIONS
     col.clearCollisions();
-    col.broadPhazeDetection(objects);
     col.narrowPhazeDetection(objects);  //detect all possible collisions
     col.resolveCollisions();    //push off
 
@@ -122,5 +121,19 @@ function moveObjectWithMouse(object) {
 
 function addObject(shape) {
     const object = new RigidBody(shape);  
+    object.setMass();
     objects.push(object);
+    console.log(object.mass, object.inverseMass);
 } 
+
+const velocityTruckEarth = new Vec (0, 70);
+const velocityEarthTruck = velocityTruckEarth.invert();
+const velocityCarEarth = new Vec (80,0);
+const velocityCarTruck = velocityCarEarth.add(velocityTruckEarth);
+console.log(velocityCarTruck.magnitude());
+
+//2 coefficient of restitution e
+const bounceHeight = 1100;
+const dropHeight = 1685;
+const e = Math.sqrt(bounceHeight / dropHeight);
+console.log(e);

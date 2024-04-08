@@ -1,6 +1,6 @@
 import {Circle} from './circle.js';
 import {Rect} from './rect.js';
-import {renderer} from './main.js';
+
 
 export class Collisions {
     constructor() {
