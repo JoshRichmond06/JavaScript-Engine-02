@@ -123,7 +123,10 @@ function addObject(shape) {
     const object = new RigidBody(shape);  
     object.setMass();
     objects.push(object);
+<<<<<<< Updated upstream
     console.log(object.mass, object.inverseMass);
+=======
+>>>>>>> Stashed changes
 } 
 
 const velocityTruckEarth = new Vec (0, 70);

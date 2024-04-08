@@ -139,6 +139,11 @@ export class Vec {
 		return this.x * v.x + this.y * v.y;
 	}
 
+	angle() {
+		return Math.atan2(this.y, this.x) * 180 / Math.pi;
+
+	}
+
 	draw(ctx, strokeColor) {
 		if (this.color) {
 			strokeColor = this.color;
