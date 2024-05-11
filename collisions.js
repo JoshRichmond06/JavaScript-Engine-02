@@ -11,7 +11,7 @@ export class Collisions {
         this.collisions = [];
         this.e = 0.5;   //coesfficient of restitution
         this.kf = 0.3;
-        this.sf = 0.5;
+        this.sf = 0.5
     }
 
     clearCollisions() {
@@ -339,7 +339,7 @@ export class Collisions {
 
                 if (calc.checkNearlyEqual(info[1], minDist) && !info[0].checkNearlyEqual(contact1)) {
                     contact2 = info[0];
-                } else if (info[1] < minDist) {
+                } else if (info[i] < minDist) {
                     contact1 = info[0];
                     minDist = info[1];
                 }
@@ -347,7 +347,7 @@ export class Collisions {
         }
 
         for (let i = 0; i < vertices2.length; i++) {
-            p = vertices2[i];
+            p = vertices1[i];
             for (let j = 0; j < vertices1.length; j++) {
                 v1 = vertices1[j];
                 v2 = vertices1[(j + 1) % vertices1.length];
@@ -356,7 +356,7 @@ export class Collisions {
 
                 if (calc.checkNearlyEqual(info[1], minDist) && !info[0].checkNearlyEqual(contact1)) {
                     contact2 = info[0];
-                } else if (info[1] < minDist) {
+                } else if (info[i] < minDist) {
                     contact1 = info[0];
                     minDist = info[1];
                 }
@@ -383,7 +383,7 @@ export class Collisions {
     }
 
     bounceOffAndRotateObjects(o1, o2, normal, point) {
-        renderer.renderedNextFrame.push(point);
+      
         //linear v from rotation at contact = r vectors from objects to contact points, rotated perp, multiplied by angVel 
         const r1 = point.clone().subtract(o1.shape.position);
         const r2 = point.clone().subtract(o2.shape.position);

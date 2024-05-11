@@ -44,7 +44,7 @@ let shapeBeingMade = null;
 //button variables
 let shapeSelected = 'r';
 let gravitySelected = 2;
-let collisionMode = 3;
+let collisionMode = 2;
 
 const circleButton = document.getElementById("c");
 const rectButton = document.getElementById("r");
