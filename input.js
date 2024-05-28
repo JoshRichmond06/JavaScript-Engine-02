@@ -1,10 +1,13 @@
 import {Vec} from './vector.js';
 
 export class Input {
-    constructor(canv, win, dt) {
-        this.canv = canv;
-        this.window = win;
-        this.dt = dt;
+    constructor(canv, win, dt, onShapeRelease) {
+        this.canv = canv; // Canvas element
+        this.window = win; // Window object
+        this.dt = dt; // Delta time for velocity calculation
+        this.onShapeRelease = onShapeRelease; // Callback when a shape is released
+
+        // Initializing input states with extended functionality
         this.inputs = {
             mouse: {position: new Vec(0, 0), velocity: new Vec(0, 0), movedObject: null}, 
             lclick: false, rclick: false, space: false, touches: 0
@@ -37,9 +40,13 @@ export class Input {
     mouseUp(e) {
         if (e.button==0) {
             this.inputs.lclick = false;
-        } else if (e.button==2)	{
+            if (this.onShapeRelease) {
+                this.onShapeRelease(this.inputs.mouse.velocity);
+            }
+        } else if (e.button == 2) {
             this.inputs.rclick = false;
         }
+        
     }
     
     onContextMenu(e) {
@@ -47,25 +54,13 @@ export class Input {
     }
 
     mouseMove(e) {
-        this.window.clearTimeout(this.inputs.mouseTimer);
-
-        const x = e.pageX - this.canv.offsetLeft;
-        const y = e.pageY - this.canv.offsetTop;
-
-        const dx = x - this.inputs.mouse.position.x;
-        const dy = y - this.inputs.mouse.position.y;
-        this.inputs.mouse.velocity.x = dx / this.dt;
-        this.inputs.mouse.velocity.y = dy / this.dt;
-
-        this.inputs.mouse.position.x = x;
-        this.inputs.mouse.position.y = y;
-        
-        this.inputs.mouseTimer = this.window.setTimeout(function () {
-            this.inputs.mouse.velocity.x = 0; 
-            this.inputs.mouse.velocity.y = 0;
-        }.bind(this), 100);
+        let newPosition = new Vec(e.pageX - this.canv.offsetLeft, e.pageY - this.canv.offsetTop);
+        let newVelocity = newPosition.clone().subtract(this.inputs.mouse.position).divide(this.dt);
+        this.inputs.mouse.velocity = newVelocity;
+        this.inputs.mouse.position = newPosition;
     }
-
+    
+    // Adjusts canvas size on window resize
     resizeCanvas() {
         this.canv.width = this.window.innerWidth;
         this.canv.height = this.window.innerHeight;

@@ -1,20 +1,44 @@
 <!DOCTYPE html>
 
 <html>
+
 <head>
     <title>2dSim</title>
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="main.js"></script>
 </head>
-    <body>
-        <div id="container">
-            <p>
-                <button type="button" id="c" title="Hold LEFT click to resize. Release to create the circle.">Circle</button>
-                <button type="button" id="r" title="Hold LEFT click to resize, RIGHT click or SPACE to orient. Release to create the rectangle.">Rectangle</button>
-            </p>
-            <canvas id="canvas">
-            </canvas>
 
-            
-    </body>
-
+<body>
+    <div id="container">
+        <div id="controls">
+            <button type="button" id="c">Circle</button>
+            <button type="button" id="r">Rectangle</button>
+        </div>
+        <div id="spring">
+            <button id="toggleSpringMode">Toggle Spring Mode</button>
+        </div>
+        <!-- <div id="springProperties" style="display:none;">
+            <select id="springSelect"></select>
+            <input type="number" id="springConstant" placeholder="Spring Constant">
+            <button onclick="setSpringProperties()">Set Properties</button>
+        </div> -->
+        <div>
+            <select id="gravity">
+                <option value="" disabled>Gravity strength</option>
+                <option value=0>Disabled gravity</option>
+                <option value=1>Weak gravity</option>
+                <option value=2 selected>Medium gravity</option>
+                <option value=3>Strong gravity</option>
+            </select>
+        </div>
+    </div>
+    <select id="collisions">
+        <option value="" disabled>Collision mode</option>
+        <option value=0>Disabled</option>
+        <option value=1>Push off</option>
+        <option value=2>Push and Bounce off</option>
+        <option value=3 selected>Bounce off and Rotate</option>
+    </select>
+    <canvas id="canvas"></canvas>
+    </div>
+</body>

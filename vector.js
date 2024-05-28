@@ -3,6 +3,7 @@ export class Vec {
 		this.x = x;
 		this.y = y;
 		this.renderOrigin;
+		this.minimumAmount = 0.05;
 	}
     //chainable methods
 	copy (v) {	//copy the xy of another vector into this
@@ -10,36 +11,54 @@ export class Vec {
 		this.y = v.y;
 		return this;
 	}
-	
-	setX (x) {
+
+	setX(x) {
 		this.x = x;
 		return this;
 	}
 
-	setY (y) {
+	setY(y) {
 		this.y = y;
 		return this;
 	}
 
-	add (v) {		//add a vector to this
+	zero() {
+		this.x = 0;
+		this.y = 0;
+		return this;
+	}
+
+	add(v) {		//add a vector to this
+		if (!v) {
+            console.error("Attempted to add undefined Vec");
+            return;
+		}
 		this.x += v.x;
 		this.y += v.y;
 		return this;
 	}
+	
 
-	addX (x) {	//scalar addition
+	addX(x) {	//scalar addition
 		this.x += x;
 		return this;
 	}
-	
-	addY (y) {	//scalar addition
+
+	addY(y) {	//scalar addition
 		this.y += y;
 		return this;
 	}
-	
-	subtract (v) {
-		this.x -= v.x;
-		this.y -= v.y;
+	subtract(other) {
+        return new Vec(this.x - other.x, this.y - other.y);
+    }
+
+	subtractX(x) {
+		this.x -= x;
+		return this;
+	}
+
+	subtractY(y) {
+		this.y -= y;
 		return this;
 	}
 
@@ -88,22 +107,47 @@ export class Vec {
 		return this;
 	}
 
-	rotateCW90() {
+	rotateCW90() {	//simple rotate for vector clock-wise 90 degrees
 		const x = this.x;
 		this.x = -this.y;
 		this.y = x;
 		return this;
-	}	
+	}
 
-	rotateCCW90() {
+	rotateCCW90() {	//simple rotate for vector counter-clock-wise 90 degrees
 		const x = this.x;
 		this.x = this.y;
 		this.y = -x;
 		return this;
-	}	
+	}
+	
+	//non-chainable
+	clone () {	//create a new vector with xy of this
+		return new Vec(this.x, this.y);
+	}
+
+    magnitude () {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	}
+
+	magnitudeSq() {
+		return this.x * this.x + this.y * this.y;
+	}
+
+	distanceTo(v) {
+		return this.clone().subtract(v).magnitude();
+	}
+
+	distanceToSq(v) {
+		return this.clone().subtract(v).magnitudeSq();
+	}
+
+	dot(v) {
+		return this.x * v.x + this.y * v.y;
+	}
 
 	invert() {
-		this.x *= -1;
+		this.x *= -1;	//makes vector that is opposite to other vector
 		this.y *= -1;
 		return this;
 	}
@@ -118,53 +162,63 @@ export class Vec {
 		return this;
 	}
 
-	moveDistInDir (dist, dir) {	//dir is a unit vector
-		return this.add(dir.clone().multiply(dist));
-	}
-	
-	//non-chainable
-	clone () {	//create a new vector with xy of this
-		return new Vec(this.x, this.y);
+	moveDistanceInDirection(distance, direction) { // direction is a unit vector
+		this.add(direction.clone().multiply(distance));
+		return this; // Ensure chainability by returning the instance
 	}
 
-    magnitude () {
-		return Math.sqrt(this.x * this.x + this.y * this.y);
-	}
-
-	distanceTo (v) {
-		return this.clone().subtract(v).magnitude();
-	}
-
-	dot(v) {
-		return this.x * v.x + this.y * v.y;
+	getMovedDistanceInDirection(distance, direction) {
+		// Returns a new Vec instance that represents the position after moving
+		// Does not mutate the current Vec instance
+		return this.clone().add(direction.clone().multiply(distance));
 	}
 
 	angle() {
-		return Math.atan2(this.y, this.x) * 180 / Math.pi;
-
+		return Math.atan2(this.y, this.x) * 180 / Math.PI;
 	}
 
-	draw(ctx, strokeColor) {
+	calculateMass(density) {
+		const area = Math.PI * this.radius * this.radius;
+		return area * density;
+	}
+
+	checkNearlyEqual(v) {
+		return this.distanceTo(v) < this.minimumAmount;	//return boolean
+	}
+
+	cross(v) {    //this - vector 1, v - vector 2, == cross(this, v)
+		return (this.x * v.y) - (this.y * v.x);
+	}
+
+	checkNearlyZero() {
+		return this.magnitude() < this.minimumAmount;
+	}
+
+	draw(ctx, strokeColor = 'black') {	// TO DO rename all draws to Vector draw, circle draw, rectangle draw, etc for readability 
 		if (this.color) {
-			strokeColor = this.color;
+			ctx.strokeStyle = this.color;
+		} else {
+			ctx.strokeStyle = strokeColor;
 		}
-		if(this.renderOrigin) {
+		if (this.renderOrigin) {
+			ctx.lineWidth = 3;
 			const renderEnd = this.renderOrigin.clone().add(this);
-			ctx.beginPath();
-			ctx.moveTo(this.renderOrigin.x, this.renderOrigin.y);
-			ctx.lineTo(renderEnd.x, renderEnd.y);
-			ctx.lineWidth = 3;
-			ctx.strokeStyle = strokeColor;
+			//line from vector tail to vector head (head is arrow part)
+
+			ctx.beginPath();	//start draw
+			ctx.moveTo(this.renderOrigin.x, this.renderOrigin.y);	//where to start draw (vectors start at origin)
+			ctx.lineTo(renderEnd.x, renderEnd.y);	//to create a strait line
 			ctx.stroke();
+
+			//circle at vector head
 			ctx.beginPath();
-			ctx.arc(renderEnd.x, renderEnd.y, 5, 0, Math.PI*2, true);	//radius 5
+			ctx.arc(renderEnd.x, renderEnd.y, 5, 0, Math.PI * 2, true);	//radius 5
 			ctx.closePath();
-			ctx.strokeStyle = strokeColor;
-			ctx.lineWidth = 3;
+
 			ctx.stroke();
 		} else {
 			ctx.beginPath();
-			ctx.arc(this.x, this.y, 5, 0, Math.PI*2, true);	//radius 5
+			ctx.arc(this.x, this.y, 5, 0, Math.PI * 2, true);	//radius 5
 			ctx.closePath();
 			ctx.strokeStyle = strokeColor;
 			ctx.lineWidth = 3;
