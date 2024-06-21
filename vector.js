@@ -29,16 +29,11 @@ export class Vec {
 	}
 
 	add(v) {		//add a vector to this
-		if (!v) {
-            console.error("Attempted to add undefined Vec");
-            return;
-		}
 		this.x += v.x;
 		this.y += v.y;
 		return this;
 	}
 	
-
 	addX(x) {	//scalar addition
 		this.x += x;
 		return this;
@@ -48,9 +43,11 @@ export class Vec {
 		this.y += y;
 		return this;
 	}
-	subtract(other) {
-        return new Vec(this.x - other.x, this.y - other.y);
-    }
+	subtract (v) {
+		this.x -= v.x;
+		this.y -= v.y;
+		return this;
+	}
 
 	subtractX(x) {
 		this.x -= x;
@@ -58,16 +55,6 @@ export class Vec {
 	}
 
 	subtractY(y) {
-		this.y -= y;
-		return this;
-	}
-
-	subtractX (x) {
-		this.x -= x;
-		return this;
-	}
-
-	subtractY (y) {
 		this.y -= y;
 		return this;
 	}

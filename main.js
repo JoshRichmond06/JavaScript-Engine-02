@@ -184,7 +184,6 @@ function updateAndDraw() {
     }
 
     springs.forEach(spring => {
-        console.log("Applying force", spring);
         spring.applyForce();
     });
 
